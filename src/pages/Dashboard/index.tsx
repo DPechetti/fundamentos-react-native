@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 
-import { View, Image } from 'react-native';
+import { View, FlatList } from 'react-native';
 
 import formatValue from '../../utils/formatValue';
 import { useCart } from '../../hooks/cart';
@@ -13,7 +13,6 @@ import {
   Container,
   ProductContainer,
   ProductImage,
-  ProductList,
   Product,
   ProductTitle,
   PriceContainer,
@@ -21,34 +20,37 @@ import {
   ProductButton,
 } from './styles';
 
-interface Product {
+interface Response {
   id: string;
   title: string;
   image_url: string;
   price: number;
+  quantity: number;
 }
 
 const Dashboard: React.FC = () => {
   const { addToCart } = useCart();
 
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Response[]>([]);
 
   useEffect(() => {
     async function loadProducts(): Promise<void> {
-      // TODO
+      const response = await api.get('/products');
+
+      setProducts(response.data);
     }
 
     loadProducts();
   }, []);
 
-  function handleAddToCart(item: Product): void {
-    // TODO
+  function handleAddToCart(item: Response): void {
+    addToCart(item);
   }
 
   return (
     <Container>
       <ProductContainer>
-        <ProductList
+        <FlatList
           data={products}
           keyExtractor={item => item.id}
           ListFooterComponent={<View />}
